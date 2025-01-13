@@ -1,0 +1,25 @@
+{
+    "reference_location" : "/var/opt/pmt/data/concheck/reference_files",
+    "cells_location"     : "/var/opt/pmt/data/cell_list",
+    "cm_folder"          : "/var/opt/pmt/data/decoded_cm",
+    "output_folder"      : "/var/opt/pmt/data/concheck/result.xlsx",
+
+    "bands" : ["L900","L1800","L2100","L2300_10","L2300_20"],
+
+    "enm_list" : ["enm9"],
+
+    "earfcn_map" : {
+        "1850"   : "L1800",
+        "3500"   : "L900",
+        "38750"  : "L2300_20",
+        "38894"  : "L2300_20",
+        "38948"  : "L2300_20",
+        "39092"  : "L2300_10",
+        "250"    : "L2100",
+        "500"    : "L2100",
+        "464000" : "N40",
+        "463000" : "N40",
+        "432000" : "N1",
+        "426500" : "N1"
+    }
+}
