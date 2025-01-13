@@ -1,5 +1,5 @@
 
-Ranterstellar is a command-line tool for easily access RAN data. Current functionality support auditing and collecting configurations.
+Ratatosk is a command-line tool for easily access RAN data. Current functionality support auditing and collecting configurations.
 
 ---
 ## Table of Contents
@@ -30,7 +30,7 @@ Ranterstellar is a command-line tool for easily access RAN data. Current functio
 Download the tar.gz file. Then run:
 ```
 cd [tar.gz-location]
-pip install ranterstellar-0.1.1.tar.gz
+pip install Ratatosk-0.1.1.tar.gz
 ```
 ---
 
@@ -70,12 +70,12 @@ The `audit-cm` command allows users to audit configurations based on a **referen
 ### 3.3 Sample Usage
 - Use `--help` to show command options and description
 ```
-ranterstellar audit-cm --help
+Ratatosk audit-cm --help
 ```
 
 - Run audit for `node` in `anchor5G.xslx` with reference in `5g_anchor_reference`, outputing a verbose report with name `test_anchor.xlsx` in the current working directory.
 ```bash
-ranterstellar audit-cm --object-list="/path/to/cell/list/file/anchor5G.xlsx" --reference="/path/to/reference/file/5g_anchor_reference.xlsx" --date="20231003" --output-folder="./test_anchor.xlsx" --preprocess=False --verbose=True
+Ratatosk audit-cm --object-list="/path/to/cell/list/file/anchor5G.xlsx" --reference="/path/to/reference/file/5g_anchor_reference.xlsx" --date="20231003" --output-folder="./test_anchor.xlsx" --preprocess=False --verbose=True
 ```
 
 ### 3.4 RAN Object File
