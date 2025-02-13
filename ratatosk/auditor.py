@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import re
 import ast
+import os
 from copy import copy
 import string
 from typing import Dict, Optional
@@ -9,6 +10,7 @@ from typing import Dict, Optional
 from pandas.api.types import is_numeric_dtype
 from .config_reference import ConfigReference
 from .cell_list import CellList
+from ratatosk.global_config import GlobalConfig
 
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -449,6 +451,10 @@ class Auditor:
         reference : config_reference object
         dict_df   : dictionary containing the CM's to be evaluated
         '''
+        global_config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+        global_config    = GlobalConfig(global_config_path)
+        dict_band = global_config.get_parameter('dict_band')
+
         dict_concheck = {}
         for mo in reference.moList :
             
@@ -488,12 +494,12 @@ class Auditor:
                         ########################## Map cell band ###########################
                         #### ini harus ada solusinya kalau pindah operator ga bisa handle dengan logic ini
 
-                        dict_band = {'T' : 'L900',
-                                    'L' : 'L1800',
-                                    'R' : 'L2100',
-                                    'E' : 'L2300_20',
-                                    'F' : 'L2300_20',
-                                    'V' : 'L2300_10' }
+                        # dict_band = {'T' : 'L900',
+                        #             'L' : 'L1800',
+                        #             'R' : 'L2100',
+                        #             'E' : 'L2300_20',
+                        #             'F' : 'L2300_20',
+                        #             'V' : 'L2300_10' }
                         
                         dict_concheck[sub_mo]['band'] = np.nan
                         if 'eutrancellfddid' in dict_concheck[sub_mo].columns:

@@ -4,7 +4,7 @@
     "cm_folder"          : "/var/opt/pmt/data/decoded_cm",
     "output_folder"      : "/var/opt/pmt/data/concheck/result.xlsx",
 
-    "bands" : ["L900","L1800","L2100","L2300_10","L2300_20"],
+    "bands" : ["L900","L1800","L2100","L2300_10","L2300_20","N1","N40"],
 
     "enm_list" : ["enm7","enm9","enm8","enm11"],
 
@@ -21,5 +21,16 @@
         "463000" : "N40",
         "432000" : "N1",
         "426500" : "N1"
+    },
+
+    "dict_band" : {
+        "T" : "L900",
+        "L" : "L1800",
+        "R" : "L2100",
+        "E" : "L2300_20",
+        "F" : "L2300_20",
+        "V" : "L2300_10",
+        "K" : "N1",
+        "P" : "N40" 
     }
 }
