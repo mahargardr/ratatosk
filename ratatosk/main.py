@@ -216,7 +216,7 @@ def audit_cm_function(
             print("filter by cell")
             filters['eutrancellfddid'] = list(cells['cell'])
             filters['eutrancelltddid'] = list(cells['cell'])
-            filters['nrcellcuid'] = list(cells['cell'])
+            filters['nrcellduid'] = list(cells['cell'])
         else:
             raise ValueError("Invalid Filter Option. Can only filter by 'node', 'site' or 'cell' ")
 
@@ -239,7 +239,7 @@ def audit_cm_function(
         #print(cm.configuration)
 
         #------- drop duplicates ------- #
-        identifier_cols = ['mecontext','siteid','eutrancellfddid','eutrancelltddid','nrcellcuid',mo_id]
+        identifier_cols = ['mecontext','siteid','eutrancellfddid','eutrancelltddid','nrcellduid',mo_id]
         duplicate_col = []
         for col in cm.configuration.columns:
             if col in identifier_cols:

@@ -59,7 +59,7 @@ class auditResult:
             df_concheck = self.audit_result[sub_mo]
 
             df_concheck['MO'] = ''
-            sub_ids = ['eutrancellfddid','eutrancelltddid','nrcellcuid',mo_id]
+            sub_ids = ['eutrancellfddid','eutrancelltddid','nrcellduid',mo_id]
             for col in df_concheck.columns:
                 if (col.endswith('id')) and (col in sub_ids):
                     # print(col)
@@ -160,7 +160,7 @@ class auditResult:
                         continue
 
                     index_col = ['mecontext']
-                    cell_cols = ['eutrancellfddid','eutrancelltddid','nrcellcuid']
+                    cell_cols = ['eutrancellfddid','eutrancelltddid','nrcellduid']
                     for col in cell_cols:
                         if (col in dict_concheck[mo].columns) & (col not in index_col):
                             index_col.append('cell')
@@ -502,14 +502,31 @@ class Auditor:
                         #             'V' : 'L2300_10' }
                         
                         dict_concheck[sub_mo]['band'] = np.nan
+                        band_pattern = r'[A-Za-z]{3}\d{3}[A-Za-z](.)'
+                        dict_concheck[sub_mo]['band_label'] = np.nan
                         if 'eutrancellfddid' in dict_concheck[sub_mo].columns:
-                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancellfddid'].str[7].map(dict_band)
+                            #dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancellfddid'].str[7].map(dict_band)
+                            empty_band_label =  dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])]
+                            empty_band_label['band_label'] = empty_band_label['eutrancellfddid'].str.extract(r'[A-Za-z]{3}\d{3}[A-Za-z](.)')
+                            #empty_band_label.loc[pd.isna(empty_band_label['band']), 'band'] = empty_band_label['band_label'].map(dict_band)
+                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])] = empty_band_label
                         if 'eutrancelltddid' in dict_concheck[sub_mo].columns:
-                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancelltddid'].str[7].map(dict_band)
-                        if 'nrcellcuid' in dict_concheck[sub_mo].columns:
-                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['nrcellcuid'].str[7].map(dict_band)
+                            #dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancelltddid'].str[7].map(dict_band)
+                            empty_band_label =  dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])]
+                            empty_band_label['band_label'] = empty_band_label['eutrancelltddid'].str.extract(r'[A-Za-z]{3}\d{3}[A-Za-z](.)')
+                            #empty_band_label.loc[pd.isna(empty_band_label['band']), 'band'] = empty_band_label['band_label'].map(dict_band)
+                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])] = empty_band_label
+                        if 'nrcellduid' in dict_concheck[sub_mo].columns:
+                            empty_band_label =  dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])]
+                            empty_band_label['band_label'] = empty_band_label['nrcellduid'].str.extract(r'[A-Za-z]{3}\d{3}[A-Za-z](.)')
+                            #empty_band_label.loc[pd.isna(empty_band_label['band']), 'band'] = empty_band_label['band_label'].map(dict_band)
+                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])] = empty_band_label
                         
-                        if ('eutrancellfddid' not in dict_concheck[sub_mo].columns) and ('eutrancelltddid' not in dict_concheck[sub_mo].columns) and ('nrcellcuid' not in dict_concheck[sub_mo].columns) :
+                        dict_concheck[sub_mo]['band'] = dict_concheck[sub_mo]['band_label'].map(dict_band)
+
+                            #dict_concheck[sub_mo] = dict_concheck[sub_mo].drop()
+                        
+                        if ('eutrancellfddid' not in dict_concheck[sub_mo].columns) and ('eutrancelltddid' not in dict_concheck[sub_mo].columns) and ('nrcellduid' not in dict_concheck[sub_mo].columns) :
                             # for site level mo, which band related to a site is irrelevant
                             dict_concheck[sub_mo]['band'] = 'L900'
                         #####################################################################
@@ -579,7 +596,7 @@ class Auditor:
                         df_dependent = df_dependent.loc[df_dependent[dep_mo.lower()+'id'] == dep_mo_id]
 
                     mapping_columns = []
-                    valid_map_columns = ['mecontext','eutrancellfddid','eutrancelltddid','nrcellcuid']
+                    valid_map_columns = ['mecontext','eutrancellfddid','eutrancelltddid','nrcellduid']
                     for col in df_config.columns:
                         if (col in valid_map_columns) and (col in df_dependent):
                             mapping_columns.append(col)

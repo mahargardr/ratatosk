@@ -39,15 +39,18 @@ class CellList:
 
         #Check if all cell list available
         s_date = datetime.now().strftime("%Y%m%d")
-        all_cell_file = f"/var/opt/pmt/data/all_cell_list/all_cell_list_{s_date}.csv"
+        all_cell_file_4g = f"/var/opt/pmt/data/all_cell_list/all_cell_list_4g_{s_date}.csv"
+        all_cell_file_5g = f"/var/opt/pmt/data/all_cell_list/all_cell_list_5g_{s_date}.csv"
             
-        if all_cell_file.split("/")[-1] not in os.listdir("/var/opt/pmt/data/all_cell_list"):
+        if all_cell_file_4g.split("/")[-1] not in os.listdir("/var/opt/pmt/data/all_cell_list"):
            #print(all_cell_file)
            #print(os.listdir("/var/opt/pmt/data/all_cell_list"))
            self.get_cell_list()
             
         #print(df_cells)
-        df_all_cell = pd.read_csv(all_cell_file)
+        df_all_cell_4g = pd.read_csv(all_cell_file_4g)
+        df_all_cell_5g = pd.read_csv(all_cell_file_5g)
+        df_all_cell = pd.concat([df_all_cell_4g,df_all_cell_5g])
         df_all_cell['ne'] = df_all_cell['cell'].str.extract(r"([A-Za-z]{3}\d{3}[A-Za-z]{2})")
         
         if filter_column == 'enm':
@@ -67,6 +70,7 @@ class CellList:
     
         fdd_columns = ['mecontext', 'eutrancellfddid', 'dlChannelBandwidth']
         tdd_columns = ['mecontext', 'eutrancelltddid', 'channelBandwidth']
+        nr_columns = ['mecontext','nrcellduid']
         print("getting all cell list")
     
         df_result = pd.DataFrame()
@@ -82,22 +86,30 @@ class CellList:
                 folder = cm_folder + '/' + enm_list + '/' + s_date
                 eutrancelllFDD_file = '%s/EUtranCellFDD.csv' %(folder)
                 eutrancelllTDD_file = '%s/EUtranCellTDD.csv' %(folder)
+                nrcelldu_file       = '%s/NRCellDU.csv'%(folder)
                 try:
                     try:
                        #print('read csv')
                        df_fdd = pd.read_csv(eutrancelllFDD_file, delimiter=",", index_col=None, header='infer',low_memory=False, usecols=fdd_columns)
                        df_tdd = pd.read_csv(eutrancelllTDD_file, delimiter=",", index_col=None, header='infer',low_memory=False, usecols=tdd_columns)
+                       df_nr = pd.read_csv(nrcelldu_file, delimiter=",", index_col=None, header='infer',low_memory=False, usecols=nr_columns)
         
                     except:
                        #print('read zip')
                        df_fdd = pd.read_csv(eutrancelllFDD_file+'.zip', delimiter=",", index_col=None, header='infer',low_memory=False, usecols=fdd_columns)
                        df_tdd = pd.read_csv(eutrancelllTDD_file+'.zip', delimiter=",", index_col=None, header='infer',low_memory=False, usecols=tdd_columns)
+                       df_nr = pd.read_csv(nrcelldu_file+'.zip', delimiter=",", index_col=None, header='infer',low_memory=False, usecols=nr_columns)
                     
                     df_fdd = df_fdd.rename(columns={'eutrancellfddid':'cell'})
                     df_tdd = df_tdd.rename(columns={'eutrancelltddid':'cell'})
                     df_tdd = df_tdd.rename(columns={'channelBandwidth':'dlChannelBandwidth'})
+                    df_nr  = df_nr.rename(columns={'nrcellduid':'cell'})
+
+                    df_fdd['RAT']  ='4G'
+                    df_tdd['RAT']  ='4G'
+                    df_nr['RAT']   ='5G'
     
-                    df_cell = pd.concat([df_fdd,df_tdd], axis=0, ignore_index=True, sort=False)
+                    df_cell = pd.concat([df_fdd,df_tdd,df_nr], axis=0, ignore_index=True, sort=False)
                     df_cell['enm'] = enm_list
     
                     if i == 0:
@@ -129,6 +141,10 @@ class CellList:
     
         df_result.dropna()
         df_result  = df_result.drop_duplicates(subset=['cell'])
+
+        df_4g = df_result.loc[df_result['RAT']=='4G']
+        df_5g = df_result.loc[df_result['RAT']=='5G']
     
-        df_result.to_csv("/var/opt/pmt/data/all_cell_list/all_cell_list_%s.csv" %s_date, index=False)
+        df_4g.to_csv("/var/opt/pmt/data/all_cell_list/all_cell_list_4g_%s.csv" %s_date, index=False)
+        df_5g.to_csv("/var/opt/pmt/data/all_cell_list/all_cell_list_5g_%s.csv" %s_date, index=False)
         
