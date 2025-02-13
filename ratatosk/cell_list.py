@@ -17,11 +17,15 @@ class CellList:
         the header is valid and return empty dataframe otherwise.
         """
         
-        filter_columns = {'node':'mecontext',
+        filter_columns_map = {'node':'mecontext',
                              'cell':'cell',
                              'site':'siteid',
                              'ne' : 'ne'}
-        filter_column = filter_columns[filter_by]
+        
+        if isinstance(filter_by, str) :
+            filter_column = filter_columns_map[filter_by]
+        else:
+            filter_column = 'enm'
 
         try:
             if self.cells_file_path != 'all':
@@ -46,7 +50,9 @@ class CellList:
         df_all_cell = pd.read_csv(all_cell_file)
         df_all_cell['ne'] = df_all_cell['cell'].str.extract(r"([A-Za-z]{3}\d{3}[A-Za-z]{2})")
         
-        if self.cells_file_path != 'all':    
+        if filter_column == 'enm':
+           df_all_cell = df_all_cell.loc[df_all_cell[filter_column].isin(filter_by)]
+        elif self.cells_file_path != 'all':    
            df_all_cell = df_all_cell.loc[df_all_cell[filter_column].isin(df_cells[filter_column])]
         #print(df_all_cell)
             

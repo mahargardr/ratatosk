@@ -137,12 +137,6 @@ def audit_cm_function(
 
     ####################### Read Variables #############################
 
-    config_reference = ConfigReference(reference_file_path)
-    cells            = CellList(cell_list_path,filter_by).cells
-    print(f'\nEvaluated Cells : {len(pd.unique(cells.cell))}')
-    print(f'Evaluated Nodes : {len(pd.unique(cells.mecontext))}\n')
-    #print(config_reference.settings)
-
     if global_config_path=='':
         global_config_path = os.path.join(os.path.dirname(__file__), 'config.json')
     global_config    = GlobalConfig(global_config_path)
@@ -156,7 +150,19 @@ def audit_cm_function(
     
     if date == '':
         date = datetime.now().date().strftime("%Y%m%d")
+        
+    if cell_list_path == 'all':
+        cells = CellList(cell_list_path,cm_subfolders).cells
+    else:
+        cells = CellList(cell_list_path,filter_by).cells
+
+    config_reference = ConfigReference(reference_file_path)
+    print(f'\nEvaluated Cells : {len(pd.unique(cells.cell))}')
+    print(f'Evaluated Nodes : {len(pd.unique(cells.mecontext))}\n')
+    #print(config_reference.settings)
     
+    print(f'Analyzing ENMs: {cm_subfolders}')
+    print(f'Analyzing configuration date {date}\n')
     ####################################################################
 
     
