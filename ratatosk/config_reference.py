@@ -23,15 +23,22 @@ class ConfigReference:
         mo_dict = {}
 
         for mo in mo_s:
+            #print(mo)
             sub_mo = mo.split('=')[0]
             df_mo = df.loc[df['sub_mo']==sub_mo]
             mo_id = sub_mo.lower()+'id'
+            # print(f"   {sub_mo}")
+            # print(f"   {df_mo}")
+            # print(f"   {mo_id}")
             if sub_mo not in mo_dict:
-
-                if '=' in mo:
-                    mo_ids = list(pd.unique(df_mo['mo_id']))
-                else:
-                    mo_ids = []
+                mo_ids = list(pd.unique(df_mo['mo_id']))
+                mo_ids = [x for x in mo_ids if x != '']
+                #print(df_mo)
+                # if '=' in mo:
+                #     mo_ids = list(pd.unique(df_mo['mo_id']))
+                # else:
+                #     mo_ids = []
+                #print(mo_ids)
 
                 parameters = list(pd.unique(df_mo['Parameter']))
 
@@ -43,7 +50,7 @@ class ConfigReference:
                 }
             else:
                 continue
-
+        
         dependencies = list(set(pd.unique(df['Dependency'])))
         for dependency in dependencies:
             mo_ids = ''
@@ -152,6 +159,7 @@ class ConfigReference:
         df_ref['MO.Parameter'] = df_ref['MO']+'.'+df_ref['Parameter']
 
         #print(df_ref)
+        #df_ref.to_csv(r"/var/opt/pmt/data/concheck_template/df_ref_debug.csv")
 
         return df_ref
         
