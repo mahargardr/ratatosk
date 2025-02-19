@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import re
 import ast
+import os
 from copy import copy
 import string
 from typing import Dict, Optional
@@ -9,6 +10,7 @@ from typing import Dict, Optional
 from pandas.api.types import is_numeric_dtype
 from .config_reference import ConfigReference
 from .cell_list import CellList
+from ratatosk.global_config import GlobalConfig
 
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -57,7 +59,7 @@ class auditResult:
             df_concheck = self.audit_result[sub_mo]
 
             df_concheck['MO'] = ''
-            sub_ids = ['eutrancellfddid','eutrancelltddid','nrcellcuid',mo_id]
+            sub_ids = ['eutrancellfddid','eutrancelltddid','nrcellduid',mo_id]
             for col in df_concheck.columns:
                 if (col.endswith('id')) and (col in sub_ids):
                     # print(col)
@@ -158,7 +160,7 @@ class auditResult:
                         continue
 
                     index_col = ['mecontext']
-                    cell_cols = ['eutrancellfddid','eutrancelltddid','nrcellcuid']
+                    cell_cols = ['eutrancellfddid','eutrancelltddid','nrcellduid']
                     for col in cell_cols:
                         if (col in dict_concheck[mo].columns) & (col not in index_col):
                             index_col.append('cell')
@@ -449,6 +451,10 @@ class Auditor:
         reference : config_reference object
         dict_df   : dictionary containing the CM's to be evaluated
         '''
+        global_config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+        global_config    = GlobalConfig(global_config_path)
+        dict_band = global_config.get_parameter('dict_band')
+
         dict_concheck = {}
         for mo in reference.moList :
             
@@ -480,6 +486,7 @@ class Auditor:
                         param = row['Parameter']
                         print('   %s'%param)
                         dependency = row['Dependency']
+                        RAT = row['Tech']
 
                         if '{' in dependency:
                             dict_dependency = self.__to_dict_str(dependency)
@@ -488,24 +495,46 @@ class Auditor:
                         ########################## Map cell band ###########################
                         #### ini harus ada solusinya kalau pindah operator ga bisa handle dengan logic ini
 
-                        dict_band = {'T' : 'L900',
-                                    'L' : 'L1800',
-                                    'R' : 'L2100',
-                                    'E' : 'L2300_20',
-                                    'F' : 'L2300_20',
-                                    'V' : 'L2300_10' }
+                        # dict_band = {'T' : 'L900',
+                        #             'L' : 'L1800',
+                        #             'R' : 'L2100',
+                        #             'E' : 'L2300_20',
+                        #             'F' : 'L2300_20',
+                        #             'V' : 'L2300_10' }
                         
                         dict_concheck[sub_mo]['band'] = np.nan
+                        band_pattern = r'[A-Za-z]{3}\d{3}[A-Za-z](.)'
+                        dict_concheck[sub_mo]['band_label'] = np.nan
                         if 'eutrancellfddid' in dict_concheck[sub_mo].columns:
-                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancellfddid'].str[7].map(dict_band)
+                            #dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancellfddid'].str[7].map(dict_band)
+                            empty_band_label =  dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])]
+                            empty_band_label['band_label'] = empty_band_label['eutrancellfddid'].str.extract(r'[A-Za-z]{3}\d{3}[A-Za-z](.)')
+                            #empty_band_label.loc[pd.isna(empty_band_label['band']), 'band'] = empty_band_label['band_label'].map(dict_band)
+                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])] = empty_band_label
                         if 'eutrancelltddid' in dict_concheck[sub_mo].columns:
-                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancelltddid'].str[7].map(dict_band)
-                        if 'nrcellcuid' in dict_concheck[sub_mo].columns:
-                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['nrcellcuid'].str[7].map(dict_band)
+                            #dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band']), 'band'] = dict_concheck[sub_mo]['eutrancelltddid'].str[7].map(dict_band)
+                            empty_band_label =  dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])]
+                            empty_band_label['band_label'] = empty_band_label['eutrancelltddid'].str.extract(r'[A-Za-z]{3}\d{3}[A-Za-z](.)')
+                            #empty_band_label.loc[pd.isna(empty_band_label['band']), 'band'] = empty_band_label['band_label'].map(dict_band)
+                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])] = empty_band_label
+                        if 'nrcellduid' in dict_concheck[sub_mo].columns:
+                            empty_band_label =  dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])]
+                            empty_band_label['band_label'] = empty_band_label['nrcellduid'].str.extract(r'[A-Za-z]{3}\d{3}[A-Za-z](.)')
+                            #empty_band_label.loc[pd.isna(empty_band_label['band']), 'band'] = empty_band_label['band_label'].map(dict_band)
+                            dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])] = empty_band_label
                         
-                        if ('eutrancellfddid' not in dict_concheck[sub_mo].columns) and ('eutrancelltddid' not in dict_concheck[sub_mo].columns) and ('nrcellcuid' not in dict_concheck[sub_mo].columns) :
-                            # for site level mo, which band related to a site is irrelevant
-                            dict_concheck[sub_mo]['band'] = 'L900'
+                        dict_concheck[sub_mo]['band'] = dict_concheck[sub_mo]['band_label'].map(dict_band)
+                        #print(dict_concheck[sub_mo])
+
+                            #dict_concheck[sub_mo] = dict_concheck[sub_mo].drop()
+                        
+                        if ('eutrancellfddid' not in dict_concheck[sub_mo].columns) and ('eutrancelltddid' not in dict_concheck[sub_mo].columns) and ('nrcellduid' not in dict_concheck[sub_mo].columns) :
+                            # for site level mo, which band related to a site is irrelevant. Choose whichever.
+                            #print(RAT)
+                            if RAT == '4G':
+                                dict_concheck[sub_mo]['band'] = 'L900'
+                            elif RAT == '5G':
+                                dict_concheck[sub_mo]['band'] = 'N2300'
                         #####################################################################
                         
                         result = pd.DataFrame()
@@ -573,7 +602,7 @@ class Auditor:
                         df_dependent = df_dependent.loc[df_dependent[dep_mo.lower()+'id'] == dep_mo_id]
 
                     mapping_columns = []
-                    valid_map_columns = ['mecontext','eutrancellfddid','eutrancelltddid','nrcellcuid']
+                    valid_map_columns = ['mecontext','eutrancellfddid','eutrancelltddid','nrcellduid']
                     for col in df_config.columns:
                         if (col in valid_map_columns) and (col in df_dependent):
                             mapping_columns.append(col)

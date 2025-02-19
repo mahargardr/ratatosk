@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 from collections import OrderedDict
 from typing import Optional, Dict
 
@@ -120,7 +121,6 @@ class Cm:
 
     def filter_eutrancellrelation(
             self,
-            enbid_lookup_dict,
             criteria='cosite'
     ):
         '''
@@ -135,13 +135,13 @@ class Cm:
         
         df_config = self.configuration
 
-        df_config['target_enbid'] = df_config[mo_id].str.split('-').str[1]
+        df_config['target_siteid'] = df_config[mo_id].str.extract(r'([A-Za-z]{3}\d{3})')
 
-        df_config['source_enbid'] = df_config['mecontext'].map(enbid_lookup_dict)
+        df_config['source_siteid'] = df_config['mecontext'].str.extract(r'([A-Za-z]{3}\d{3})')
 
         if criteria == 'cosite':
             df_config['cosite'] = 0
-            df_config.loc[df_config['source_enbid'] == df_config['target_enbid'], 'cosite'] = 1
+            df_config.loc[df_config['source_siteid'] == df_config['target_siteid'], 'cosite'] = 1
 
         else:
             '''
@@ -276,25 +276,25 @@ class cmCollector:
                 columns.append('eutrancellfddid')
             if 'eutrancelltddid' in df_config.columns:
                 columns.append('eutrancelltddid')
-            if 'nrcellcuid' in df_config.columns:
-                columns.append('nrcellcuid')
+            if 'nrcellduid' in df_config.columns:
+                columns.append('nrcellduid')
                 
             #print(f"df size : {len(df_config)}")
             ### Filtering ###
             if len(filters)>0:
                 #print(filters)
-                if ('eutrancellfddid' in columns) or ('eutrancelltddid' in columns) or ('nrcellcuid' in columns):
+                if ('eutrancellfddid' in columns) or ('eutrancelltddid' in columns) or ('nrcellduid' in columns):
                     split_dfs = []
                     if 'eutrancellfddid' in columns:
                         df_config_fdd = df_config[df_config['eutrancellfddid'].notna()]
-                        df_config_fdd = self.filter_cm(df_config_fdd.drop(columns=['eutrancelltddid','nrcellcuid'],errors='ignore'),filters)
+                        df_config_fdd = self.filter_cm(df_config_fdd.drop(columns=['eutrancelltddid','nrcellduid'],errors='ignore'),filters)
                         split_dfs.append(df_config_fdd)
                     if 'eutrancelltddid' in columns:
                         df_config_tdd = df_config[df_config['eutrancelltddid'].notna()]
-                        df_config_tdd = self.filter_cm(df_config_tdd.drop(columns=['eutrancellfddid','nrcellcuid'],errors='ignore'),filters)
+                        df_config_tdd = self.filter_cm(df_config_tdd.drop(columns=['eutrancellfddid','nrcellduid'],errors='ignore'),filters)
                         split_dfs.append(df_config_tdd)
-                    if 'nrcellcuid' in columns:
-                        df_nr = df_config[df_config['nrcellcuid'].notna()]
+                    if 'nrcellduid' in columns:
+                        df_nr = df_config[df_config['nrcellduid'].notna()]
                         df_nr = self.filter_cm(df_nr.drop(columns=['eutrancellfddid','eutrancelltddid'],errors='ignore'),filters)
                         split_dfs.append(df_nr)
                     
@@ -338,7 +338,7 @@ class cmCollector:
         #print(f"filters : {filters}")
         for filter in filters:
             if filter in df.columns:
-                if (filter != 'eutrancellfddid') and (filter != 'eutrancelltddid') and (filter != 'nrcellcuid'):
+                if (filter != 'eutrancellfddid') and (filter != 'eutrancelltddid') and (filter != 'nrcellduid'):
                     df[filter] = df[filter].astype(str).str.replace('\.0','')
                 df = df.loc[df[filter].isin(filters[filter])]
         return df
