@@ -486,6 +486,7 @@ class Auditor:
                         param = row['Parameter']
                         print('   %s'%param)
                         dependency = row['Dependency']
+                        RAT = row['Tech']
 
                         if '{' in dependency:
                             dict_dependency = self.__to_dict_str(dependency)
@@ -523,12 +524,17 @@ class Auditor:
                             dict_concheck[sub_mo].loc[pd.isna(dict_concheck[sub_mo]['band_label'])] = empty_band_label
                         
                         dict_concheck[sub_mo]['band'] = dict_concheck[sub_mo]['band_label'].map(dict_band)
+                        #print(dict_concheck[sub_mo])
 
                             #dict_concheck[sub_mo] = dict_concheck[sub_mo].drop()
                         
                         if ('eutrancellfddid' not in dict_concheck[sub_mo].columns) and ('eutrancelltddid' not in dict_concheck[sub_mo].columns) and ('nrcellduid' not in dict_concheck[sub_mo].columns) :
-                            # for site level mo, which band related to a site is irrelevant
-                            dict_concheck[sub_mo]['band'] = 'L900'
+                            # for site level mo, which band related to a site is irrelevant. Choose whichever.
+                            print(RAT)
+                            if RAT == '4G':
+                                dict_concheck[sub_mo]['band'] = 'L900'
+                            elif RAT == '5G':
+                                dict_concheck[sub_mo]['band'] = 'N2300'
                         #####################################################################
                         
                         result = pd.DataFrame()
