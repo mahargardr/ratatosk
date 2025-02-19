@@ -267,20 +267,33 @@ def audit_cm_function(
 
         #-------- Select co-site only for cell relation MO ---------#
         if 'cellrelation' in mo.lower():
+            #RAT = config_reference.settings.loc[config_reference.settings['MO']==mo]['Tech'].iloc[0]
+            #print(RAT)
             ## load enodebfunction
-            df_enbfunction = cmc.collect_cm(
-                                'ENodeBFunction',
-                                date,
-                                cm_folder_path,
-                                parameters=['enbid'],
-                                filters={},
-                                sub_folders=cm_subfolders,
-                                file_ext=file_ext
-                            ).configuration
-            df_enbfunction['enbid'] = df_enbfunction['enbid'].astype(str).str.replace(".0","")
-            dict_enb = df_enbfunction.set_index('mecontext').to_dict()['enbid']
-            cm.configuration = cm.filter_eutrancellrelation(dict_enb)
-            cm.configuration.to_csv("eutrancellrelation_debug.csv")
+            # if RAT == '4G':
+            #     df_enbfunction = cmc.collect_cm(
+            #                         'ENodeBFunction',
+            #                         date,
+            #                         cm_folder_path,
+            #                         parameters=['enbid'],
+            #                         filters={},
+            #                         sub_folders=cm_subfolders,
+            #                         file_ext=file_ext
+            #                     ).configuration
+            # elif RAT == '5G':
+            #     df_enbfunction = cmc.collect_cm(
+            #                         'GNodeBFunction',
+            #                         date,
+            #                         cm_folder_path,
+            #                         parameters=['enbid'],
+            #                         filters={},
+            #                         sub_folders=cm_subfolders,
+            #                         file_ext=file_ext
+            #                     ).configuration
+            # df_enbfunction['enbid'] = df_enbfunction['enbid'].astype(str).str.replace(".0","")
+            # dict_enb = df_enbfunction.set_index('mecontext').to_dict()['enbid']
+            cm.configuration = cm.filter_eutrancellrelation()
+            #cm.configuration.to_csv("eutrancellrelation_debug.csv")
         #----------------------------------------------------------#
 
         #print(len(cm.configuration))

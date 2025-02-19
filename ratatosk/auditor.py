@@ -530,7 +530,7 @@ class Auditor:
                         
                         if ('eutrancellfddid' not in dict_concheck[sub_mo].columns) and ('eutrancelltddid' not in dict_concheck[sub_mo].columns) and ('nrcellduid' not in dict_concheck[sub_mo].columns) :
                             # for site level mo, which band related to a site is irrelevant. Choose whichever.
-                            print(RAT)
+                            #print(RAT)
                             if RAT == '4G':
                                 dict_concheck[sub_mo]['band'] = 'L900'
                             elif RAT == '5G':

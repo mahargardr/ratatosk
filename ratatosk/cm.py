@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 from collections import OrderedDict
 from typing import Optional, Dict
 
@@ -120,7 +121,6 @@ class Cm:
 
     def filter_eutrancellrelation(
             self,
-            enbid_lookup_dict,
             criteria='cosite'
     ):
         '''
@@ -135,13 +135,13 @@ class Cm:
         
         df_config = self.configuration
 
-        df_config['target_enbid'] = df_config[mo_id].str.split('-').str[1]
+        df_config['target_siteid'] = df_config[mo_id].str.extract(r'([A-Za-z]{3}\d{3})')
 
-        df_config['source_enbid'] = df_config['mecontext'].map(enbid_lookup_dict)
+        df_config['source_siteid'] = df_config['mecontext'].str.extract(r'([A-Za-z]{3}\d{3})')
 
         if criteria == 'cosite':
             df_config['cosite'] = 0
-            df_config.loc[df_config['source_enbid'] == df_config['target_enbid'], 'cosite'] = 1
+            df_config.loc[df_config['source_siteid'] == df_config['target_siteid'], 'cosite'] = 1
 
         else:
             '''
