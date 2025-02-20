@@ -240,8 +240,8 @@ class auditResult:
                         print("          %s" %col_name)
                         
                         if action.lower() == 'as info':
-                            df_sheet.loc[pd.notnull(df_sheet[col_name]),col_name+'_check'] = 'OK'
-                            df_sheet[col_name+'_ref'] = rules
+                            df_sheet.loc[pd.notnull(df_sheet[col_name+'_ref']),col_name+'_check'] = 'As Info'
+                            df_sheet.loc[df_sheet[col_name+'_check']=='As Info',col_name+'_ref'] = rules
                         
                         df_sheet.loc[((pd.isnull(df_sheet[col_name+'_check'])) & (df_sheet[col_name]=="-")),col_name+'_check'] = 'OK'
 
@@ -432,7 +432,10 @@ class auditResult:
             summary_dict['NOK'] = 0
         if not ('NA' in summary_dict):
             summary_dict['NA'] = 0
+        if not ('As Info' in summary_dict):
+            summary_dict['As Info'] = 0
         
+        summary_dict['OK'] += summary_dict['As Info'] 
         summary_dict['NA'] = len(series)-summary_dict['OK']-summary_dict['NOK']
         
         return summary_dict
