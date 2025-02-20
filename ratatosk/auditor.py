@@ -244,6 +244,8 @@ class auditResult:
                             df_sheet.loc[df_sheet[col_name+'_check']=='As Info',col_name+'_ref'] = rules
                         
                         df_sheet.loc[(pd.isnull(df_sheet[col_name+'_ref'])), col_name+'_check'] = 'NC'
+                        df_sheet.loc[((df_sheet[col_name+'_ref']=='None') & (pd.notnull(df_sheet[col_name]))), col_name+'_check'] = 'NC'
+
                         df_sheet.loc[((pd.isnull(df_sheet[col_name+'_check'])) & (df_sheet[col_name]=="-")),col_name+'_check'] = 'OK'
 
                         #df_sheet.loc[(pd.isnull(df_sheet[col_name+'_check'])) | (pd.isnull(df_sheet[col_name])),'check_'+group] = 'NA'
