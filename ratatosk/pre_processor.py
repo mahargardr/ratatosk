@@ -236,6 +236,10 @@ class cmPreProcessor():
             elif mo == 'SubscriberGroupProfile': 
                 df['preschedProfileRef'] = df['preschedProfileRef'].str.split('=').str[-1]
                 df['modified'] = 1
+            elif mo == 'RlfProfile': 
+                df['reservedBy_ori'] = df['reservedBy']
+                df['reservedBy'] = df['reservedBy'].str.extract(r'QciProfilePredefined=([^,\s]+)')
+                df['modified'] = 1
 
             df.to_csv(file.replace('.zip','.csv'), index=False)
 

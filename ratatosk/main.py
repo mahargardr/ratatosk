@@ -187,7 +187,8 @@ def audit_cm_function(
                 'QciProfilePredefined',
                 'SubscriberGroupProfile',
                 'QciProfileOperatorDefined',
-                'ReportConfigSearch'
+                'ReportConfigSearch',
+                'RlfProfile'
             ],
             file_type=file_ext
         )
