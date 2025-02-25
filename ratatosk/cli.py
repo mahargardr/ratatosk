@@ -22,6 +22,7 @@ def main():
 @click.option('--output', default='',type=str, help='Output folder path')
 @click.option('--preprocess', default=True,type=bool, help='Run preprocess or not')
 @click.option('--file-ext', default='csv',type=str, help='File Extension')
+@click.option('--rat', default='',type=str, help='Radio access technology to be audit')
 @click.option('--arg-file', default='',type=str, help='Path for command argument file')
 
 def audit_cm(
@@ -36,6 +37,7 @@ def audit_cm(
     output,
     verbose,
     preprocess,
+    rat,
     arg_file,
 ):
     """
@@ -58,6 +60,7 @@ def audit_cm(
        verbose = args.get('verbose',object_list)
        output = args.get('output',object_list)
        preprocess = args.get('preprocess',object_list)
+       rat = args.get('rat',object_list)
        file_ext = args.get('file_ext',object_list)
     
     
@@ -79,7 +82,8 @@ def audit_cm(
        file_ext,
        output,
        verbose,
-       preprocess
+       preprocess,
+       rat
     )
     
 @main.command()

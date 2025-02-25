@@ -129,7 +129,8 @@ def audit_cm_function(
         file_ext='csv',
         output_folder_path='',
         verbose=False,
-        preprocess=True
+        preprocess=True,
+        rat=['4G','5G']
     ):
     '''
     
@@ -152,9 +153,9 @@ def audit_cm_function(
         date = datetime.now().date().strftime("%Y%m%d")
         
     if cell_list_path == 'all':
-        cells = CellList(cell_list_path,cm_subfolders).cells
+        cells = CellList(cell_list_path,cm_subfolders,rat).cells
     else:
-        cells = CellList(cell_list_path,filter_by).cells
+        cells = CellList(cell_list_path,filter_by,rat).cells
 
     config_reference = ConfigReference(reference_file_path)
     print(f'\nEvaluated Cells : {len(pd.unique(cells.cell))}')
@@ -186,7 +187,8 @@ def audit_cm_function(
                 'QciProfilePredefined',
                 'SubscriberGroupProfile',
                 'QciProfileOperatorDefined',
-                'ReportConfigSearch'
+                'ReportConfigSearch',
+                'RlfProfile'
             ],
             file_type=file_ext
         )

@@ -133,7 +133,7 @@ class auditResult:
             param_start_index = [indicator_pos]
             group_letter =[]
 
-            indicator_summary_dict = {'Parameter Indicator': indicator, 'OK': 0, 'NOK': 0, 'NA': ''}
+            indicator_summary_dict = {'Parameter Indicator': indicator, 'OK': 0, 'NOK': 0, 'NA': '', 'NC': ''}
             group_summary_list = []
 
             for group in pd.unique(df_indicator['Group Parameter']):
@@ -212,7 +212,7 @@ class auditResult:
                         
                         if mo.lower()+'id' in cell_cols:
                             df_sheet.loc[pd.isnull(df_sheet['duplex_type']),'duplex_type'] = df_sheet.loc[pd.isnull(df_sheet['duplex_type'])].set_index(index_col).index.map(dict_concheck_mapper['duplex_type'])
-                            df_sheet.loc[(pd.isnull(df_sheet[col_name]) & (df_sheet['duplex_type']!=mo.lower())) ,col_name] = "-"
+                            # df_sheet.loc[(pd.isnull(df_sheet[col_name]) & (df_sheet['duplex_type']!=mo.lower())) ,col_name] = "-"
                             #print(f"df sheet : {df_sheet.loc[(pd.isnull(df_sheet[col_name]) & (df_sheet['duplex_type']!=mo.lower()))]}")
                             #if 'eutrancellfdd' in col_name.lower():
                             #print(f"df sheet : {df_sheet}")
@@ -240,10 +240,13 @@ class auditResult:
                         print("          %s" %col_name)
                         
                         if action.lower() == 'as info':
-                            df_sheet.loc[pd.notnull(df_sheet[col_name]),col_name+'_check'] = 'OK'
-                            df_sheet[col_name+'_ref'] = rules
+                            df_sheet.loc[pd.notnull(df_sheet[col_name+'_ref']),col_name+'_check'] = 'As Info'
+                            df_sheet.loc[df_sheet[col_name+'_check']=='As Info',col_name+'_ref'] = rules
                         
-                        df_sheet.loc[((pd.isnull(df_sheet[col_name+'_check'])) & (df_sheet[col_name]=="-")),col_name+'_check'] = 'OK'
+                        df_sheet.loc[(pd.isnull(df_sheet[col_name+'_ref'])), col_name+'_check'] = 'NC'
+                        df_sheet.loc[((df_sheet[col_name+'_ref']=='None') & (pd.notnull(df_sheet[col_name]))), col_name+'_check'] = 'NC'
+
+                        # df_sheet.loc[((pd.isnull(df_sheet[col_name+'_check'])) & (df_sheet[col_name]=="-")),col_name+'_check'] = 'OK'
 
                         #df_sheet.loc[(pd.isnull(df_sheet[col_name+'_check'])) | (pd.isnull(df_sheet[col_name])),'check_'+group] = 'NA'
                         df_sheet.loc[(pd.isnull(df_sheet['check_'+group])) & (df_sheet[col_name+'_check'] == 'NOK'),'check_'+group] = 'NOK'
@@ -252,7 +255,8 @@ class auditResult:
                         param_summary = {'Parameter Indicator': col_name, 
                                         'OK': summary_dict['OK'], 
                                         'NOK': summary_dict['NOK'], 
-                                        'NA': summary_dict['NA']}
+                                        'NA': summary_dict['NA'],
+                                        'NC': summary_dict['NC']}
                         param_summary_list.append(param_summary)
 
                 df_sheet.loc[(pd.isnull(df_sheet['check_'+group])),'check_'+group] = 'OK'
@@ -264,7 +268,8 @@ class auditResult:
                 group_summary = {'Parameter Indicator': group, 
                                 'OK': summary_dict['OK'], 
                                 'NOK': summary_dict['NOK'], 
-                                'NA': summary_dict['NA']}
+                                'NA': summary_dict['NA'],
+                                'NC': summary_dict['NC']}
                 group_summary_list.append(group_summary)
                 group_summary_list += param_summary_list
 
@@ -304,6 +309,7 @@ class auditResult:
             indicator_summary_dict['OK'] = summary_dict['OK']
             indicator_summary_dict['NOK'] = summary_dict['NOK']
             indicator_summary_dict['NA'] = summary_dict['NA']
+            indicator_summary_dict['NC'] = summary_dict['NC']
             group_summary_list.insert(0,indicator_summary_dict)
 
             summary_data += group_summary_list
@@ -432,7 +438,12 @@ class auditResult:
             summary_dict['NOK'] = 0
         if not ('NA' in summary_dict):
             summary_dict['NA'] = 0
+        if not ('As Info' in summary_dict):
+            summary_dict['As Info'] = 0
+        if not ('NC' in summary_dict):
+            summary_dict['NC'] = 0    
         
+        summary_dict['OK'] += summary_dict['As Info'] + summary_dict['NC']
         summary_dict['NA'] = len(series)-summary_dict['OK']-summary_dict['NOK']
         
         return summary_dict

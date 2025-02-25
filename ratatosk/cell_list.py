@@ -7,8 +7,12 @@ from ratatosk.global_config import GlobalConfig
 from .exceptions import InvalidHeaderError 
 
 class CellList:
-    def __init__(self,cells_file_path,filter_by):
+    def __init__(self,
+                 cells_file_path,
+                 filter_by,
+                 rat: list):
         self.cells_file_path = cells_file_path
+        self.rat = rat
         self.cells = self.load_cells(filter_by)
         
     def load_cells(self,filter_by):
@@ -48,9 +52,17 @@ class CellList:
            self.get_cell_list()
             
         #print(df_cells)
-        df_all_cell_4g = pd.read_csv(all_cell_file_4g)
-        df_all_cell_5g = pd.read_csv(all_cell_file_5g)
-        df_all_cell = pd.concat([df_all_cell_4g,df_all_cell_5g])
+        df_all_cell = pd.DataFrame()
+        if '4G' in self.rat:
+            df_all_cell_4g = pd.read_csv(all_cell_file_4g)
+            df_all_cell = df_all_cell_4g
+        if '5G' in self.rat:
+            df_all_cell_5g = pd.read_csv(all_cell_file_5g)
+            if len(df_all_cell)>0:
+                df_all_cell = pd.concat([df_all_cell,df_all_cell_5g])
+            else:
+                df_all_cell = df_all_cell_5g
+        
         df_all_cell['ne'] = df_all_cell['cell'].str.extract(r"([A-Za-z]{3}\d{3}[A-Za-z]{2})")
         
         if filter_column == 'enm':
