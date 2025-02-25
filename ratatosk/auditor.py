@@ -212,7 +212,7 @@ class auditResult:
                         
                         if mo.lower()+'id' in cell_cols:
                             df_sheet.loc[pd.isnull(df_sheet['duplex_type']),'duplex_type'] = df_sheet.loc[pd.isnull(df_sheet['duplex_type'])].set_index(index_col).index.map(dict_concheck_mapper['duplex_type'])
-                            df_sheet.loc[(pd.isnull(df_sheet[col_name]) & (df_sheet['duplex_type']!=mo.lower())) ,col_name] = "-"
+                            # df_sheet.loc[(pd.isnull(df_sheet[col_name]) & (df_sheet['duplex_type']!=mo.lower())) ,col_name] = "-"
                             #print(f"df sheet : {df_sheet.loc[(pd.isnull(df_sheet[col_name]) & (df_sheet['duplex_type']!=mo.lower()))]}")
                             #if 'eutrancellfdd' in col_name.lower():
                             #print(f"df sheet : {df_sheet}")
@@ -246,7 +246,7 @@ class auditResult:
                         df_sheet.loc[(pd.isnull(df_sheet[col_name+'_ref'])), col_name+'_check'] = 'NC'
                         df_sheet.loc[((df_sheet[col_name+'_ref']=='None') & (pd.notnull(df_sheet[col_name]))), col_name+'_check'] = 'NC'
 
-                        df_sheet.loc[((pd.isnull(df_sheet[col_name+'_check'])) & (df_sheet[col_name]=="-")),col_name+'_check'] = 'OK'
+                        # df_sheet.loc[((pd.isnull(df_sheet[col_name+'_check'])) & (df_sheet[col_name]=="-")),col_name+'_check'] = 'OK'
 
                         #df_sheet.loc[(pd.isnull(df_sheet[col_name+'_check'])) | (pd.isnull(df_sheet[col_name])),'check_'+group] = 'NA'
                         df_sheet.loc[(pd.isnull(df_sheet['check_'+group])) & (df_sheet[col_name+'_check'] == 'NOK'),'check_'+group] = 'NOK'
