@@ -227,7 +227,8 @@ class cmPreProcessor():
                 df['drxProfileRef'] = df['drxProfileRef'].str.split('=').str[-1]
                 df['logicalChannelGroupRefValue'] = df['logicalChannelGroupRef'].str[-1]
                 df['modified'] = 1
-            elif mo == 'QciProfileOperatorDefined': 
+            elif mo == 'QciProfileOperatorDefined':
+                df['drxProfileRef'] = df['drxProfileRef'].str.extract(r'DataDrxProfile=([^,\s]+)')
                 df['logicalChannelGroupRefValue'] = df['logicalChannelGroupRef'].str[-1]
                 df['modified'] = 1
             elif mo == 'ReportConfigSearch': 
